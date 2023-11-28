@@ -33,7 +33,8 @@ def retrieve_commit():
         with open(".commit.txt", "r") as file:
             return file.read().strip()
     except FileNotFoundError:
-        return None
+        print("File not found")
+        return
 
 if __name__ == "__main__":
     token = ""
