@@ -29,8 +29,11 @@ def store_commit(commit):
         return commit
 
 def retrieve_commit():
-    with open(".commit.txt", "r") as file:
-        return file.read().split()
+    try:
+        with open(".commit.txt", "r") as file:
+            return file.read().strip()
+    except FileNotFoundError:
+        return None
 
 if __name__ == "__main__":
     token = ""
