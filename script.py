@@ -1,19 +1,13 @@
-import requests
+import requests, subprocess
 
-token = ""
-owner = "Viole01"
-repo = "CICD-Vired"
-fp = "commit.txt"
-
-
-def get_latest_commit(owner, repo):
-    url = "https://api.github.com/repos/{}/{}/commits"
+def get_latest_commit(owner, repo, token):
+    url = "https://api.github.com/repos/{}/{}/commits".format(owner, repo)
     headers = {
     "Authorization": "Bearer {}".format(token)
     }
     # Using try except block for error handling
     try:
-        response = requests.get(url.format(owner, repo), headers=headers)
+        response = requests.get(url, headers=headers)
         response.raise_for_status()
 
         commits = response.json()
@@ -29,10 +23,29 @@ def get_latest_commit(owner, repo):
         print(f"Error: {e}")
         return
     
-latest_commit = get_latest_commit(owner, repo)
+def store_commit(commit):
+    with open(".commit.txt", "w") as file:
+        file.write(commit)
+        return commit
 
-# Using with statement to open the file in write mode
-with open(fp, "w") as file:
-    file.write(latest_commit)
+def retrieve_commit():
+    with open(".commit.txt", "r") as file:
+        return file.read().split()
 
-print(latest_commit)
+if __name__ == "__main__":
+    token = ""
+    owner = "Viole01"
+    repo = "CICD-Vired"
+
+    latest_commit = get_latest_commit(owner, repo, token)
+    stored_commit = retrieve_commit()
+
+    try:
+        if latest_commit != stored_commit:
+            subprocess.run(["sh", "bash.sh"])
+            store_commit(latest_commit)
+    except FileNotFoundError:
+        print("File not found. Creating a new file")
+        store_commit(latest_commit)
+
+    print(latest_commit)
